@@ -1,0 +1,89 @@
+USE School
+-- CREATING TABLES
+CREATE TABLE Subjects
+(
+Id INT PRIMARY KEY IDENTITY NOT NULL,
+Name NVARCHAR(20) NOT NULL,
+Lessons INT NOT NULL,
+)
+
+CREATE TABLE Exams
+(
+Id INT PRIMARY KEY IDENTITY NOT NULL,
+Date DATE,
+SubjectId INT FOREIGN KEY REFERENCES Subjects(Id)
+)
+
+CREATE TABLE Students
+(
+Id INT PRIMARY KEY IDENTITY NOT NULL,
+FirstName NVARCHAR(20) NOT NULL,
+MiddleName NVARCHAR(20),
+LastName NVARCHAR(20) NOT NULL,
+Age INT NOT NULL CHECK (Age > 0),
+Address NVARCHAR(30),
+Phone NVARCHAR(10)
+)
+
+CREATE TABLE Teachers
+(
+Id INT PRIMARY KEY IDENTITY NOT NULL,
+FirstName NVARCHAR(20) NOT NULL,
+LastName NVARCHAR(20) NOT NULL,
+Address NVARCHAR(20) NOT NULL,
+Phone NVARCHAR(10),
+SubjectId INT FOREIGN KEY REFERENCES Subjects(Id)
+)
+--Creating table STUDENTSSUBJECT
+CREATE TABLE StudentsSubject(
+Id INT PRIMARY KEY IDENTITY,
+StudentsId INT  NOT NULL,
+SubjectId INT NOT NULL,
+Grade DECIMAL(16,2) CHECK (Grade>= 2 AND  Grade <=6) NOT NULL,
+CONSTRAINT FK_StudentsSubjects_Students FOREIGN KEY (StudentsId) REFERENCES Students(Id),
+CONSTRAINT FK_StudentsSubjects_Subjects FOREIGN KEY (SubjectId) REFERENCES Subjects(Id))
+
+
+--Creating table STUDENTSEXAMS
+CREATE TABLE StudentsExams(
+StudentId INT NOT NULL,
+ExamId INT NOT NULL,
+Grade DECIMAL(16,2) CHECK (Grade >= 2 AND GRADE <=6) NOT NULL,
+CONSTRAINT PK_StudentsExams PRIMARY KEY (StudentId,ExamId),
+CONSTRAINT FK_StudentsExams_Students FOREIGN KEY (StudentId) REFERENCES Students(Id),
+CONSTRAINT FK_StudentsExams_Exams FOREIGN KEY (ExamId) REFERENCES Exams(Id))
+
+
+--Creating table StudentsTeacher
+CREATE TABLE StudentsTeachers(
+StudentsId INT NOT NULL,
+TeacherId INT NOT NULL,
+CONSTRAINT PK_StudentsTeachers PRIMARY KEY (StudentsId,TeacherId),
+CONSTRAINT FK_StudentsTeachers_Students FOREIGN KEY (StudentsId) REFERENCES Students(Id),
+CONSTRAINT FK_StudentsTeachers_Teachers FOREIGN KEY (TeacherId) REFERENCES Teachers(Id))
+
+
+--INSERT INTO TABLES
+INSERT INTO Teachers (FirstName, LastName,Address, Phone, SubjectId) VALUES
+('Ruthanne',	'Bamb',	'84948 Mesta Junction',	'3105500146',	6),
+('Gerrard',	'Lowin',	'370 Talisman Plaza',	'3324874824',	2),
+('Merrile',	'Lambdin',	'81 Dahle Plaza',	'4373065154',	5),
+('Bert',	'Ivie',	'2 Gateway Circle',	'4409584510',	4)
+
+
+INSERT INTO  Subjects (Name, Lessons) VALUES
+('Geometry', 12),
+('Health', 10),
+('Drama', 7),
+('Sports', 9)
+
+--UPDATE
+ Update
+UPDATE StudentsSubjects
+SET Grade = 6.00
+WHERE Grade >= 5.50 AND SubjectId IN (1, 2)
+
+-- DELETE
+DELETE FROM StudentsTeachers
+WHERE TeacherId IN (SELECT Id FROM Teachers WHERE Phone LIKE '%72%')
+
